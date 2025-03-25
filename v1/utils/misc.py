@@ -6,6 +6,7 @@ from v1.config import settings
 
 
 def get_hash(text: str):
+    """Return the SHA-256 hash of the input text."""
     return hashlib.sha256(text.encode()).hexdigest()
 
 

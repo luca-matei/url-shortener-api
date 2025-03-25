@@ -11,7 +11,8 @@ router = APIRouter()
 
 
 @router.get("/{code:str}")
-async def redirect_url(request: Request, code: str):
+async def redirect_url_route(request: Request, code: str):
+    """Redirect to the URL associated with the code."""
     async with RedisSession() as cache:
         url = await cache.get(code)
 
@@ -23,7 +24,12 @@ async def redirect_url(request: Request, code: str):
 
 
 @router.post("/")
-async def create_code(payload: NewShort, user: User = Depends(get_current_user)):
+async def create_code_route(payload: NewShort, user: User = Depends(get_current_user)):
+    """
+    Create a new short URL.
+    Only authenticated users can create short URLs.
+    Users can provide a custom code, otherwise a random code will be generated.
+    """
     url = payload.url
     code = payload.code
 
@@ -59,12 +65,13 @@ async def create_code(payload: NewShort, user: User = Depends(get_current_user))
 
 
 @router.put("/{code:str}")
-async def update_code(
+async def update_code_route(
     code: str,
     payload: EditShort,
     reset: bool = False,
     user: User = Depends(get_current_user),
 ):
+    """Update the URL associated with the code."""
     url = payload.url
 
     async with RedisSession() as cache:
@@ -84,7 +91,8 @@ async def update_code(
 
 
 @router.delete("/{code:str}")
-async def delete_code(code: str, user: User = Depends(get_current_user)):
+async def delete_code_route(code: str, user: User = Depends(get_current_user)):
+    """Delete the URL associated with the code."""
     async with RedisSession() as cache:
         url = await cache.get(code)
         if not url:
@@ -99,7 +107,8 @@ async def delete_code(code: str, user: User = Depends(get_current_user)):
 
 
 @router.delete("/{code:str}/analytics")
-async def delete_analytics(code: str, user: User = Depends(get_current_user)):
+async def reset_analytics_route(code: str, user: User = Depends(get_current_user)):
+    """Reset the analytics for the code."""
     async with RedisSession() as cache:
         url = await cache.get(code)
         if not url:

@@ -10,6 +10,7 @@ security = HTTPBearer()
 async def get_current_user(
     token: HTTPAuthorizationCredentials = Security(security),
 ) -> User:
+    """Basic authentication"""
     if token:
         if token.credentials == settings.admin_token:
             return User(username="admin")
